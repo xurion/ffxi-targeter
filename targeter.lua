@@ -39,7 +39,14 @@ end
 
 commands.add = function(...)
     local target = T{...}:sconcat()
-    if target == '' or target == 'nil' then return end
+    if target == 'nil' then return end
+
+    if target == '' then
+        local selected_target = windower.ffxi.get_mob_by_target('t')
+        if not selected_target then return end
+        target = selected_target.name
+    end
+
     target = target:lower()
     if not settings.targets:contains(target) then
         settings.targets:append(target)
@@ -53,6 +60,14 @@ commands.a = commands.add
 
 commands.remove = function(...)
     local target = T{...}:sconcat()
+
+    if target == '' then
+        local selected_target = windower.ffxi.get_mob_by_target('t')
+        if not selected_target then return end
+        target = selected_target.name
+    end
+
+    target = target:lower()
     local new_targets = L{}
     for k, v in ipairs(settings.targets) do
         if v ~= target then
@@ -140,6 +155,8 @@ end)
     Add a multiple-worded name
     Add a null name
     Add a duplicate
+
+    Add with a selected target and no target name (//targ add)
 
     Add a preset
     Add an invalid preset
