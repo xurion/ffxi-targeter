@@ -26,6 +26,10 @@ Simply running `//targ add` will add the currently selected target to the target
 
 Simply running `//targ remove` will remove the currently selected target remove the target list.
 
+## Removing all targets
+
+`//targ removeall` or `//targ ra` removes all targets from the target list.
+
 ## Display the target list
 
 `//targ list` or `//targ l`
