@@ -4,7 +4,7 @@
 
 An FFXI Windower 4 addon that targets the nearest enemy to you based on a target list.
 
-*Use case:* In Dynamis Divergence, quickly target the closest statue amongst other enemies, even if it is right behind you.
+*Example:* In Dynamis Divergence, quickly target the closest statue amongst other enemies, even if it is right behind you.
 
 ## Load
 
