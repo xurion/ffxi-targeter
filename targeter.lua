@@ -122,6 +122,10 @@ commands.target = function()
         ['Target'] = closest.id,
         ['Player Index'] = player.index,
     }))
+
+    if player.status == 1 then
+        windower.send_command('wait 0.5; input /attack <t>')
+    end
 end
 commands.t = commands.target
 
@@ -147,23 +151,3 @@ windower.register_event('addon command', function(command, ...)
         commands.help()
     end
 end)
-
---[[
-    Tests:
-
-    Add a single-worded name
-    Add a multiple-worded name
-    Add a null name
-    Add a duplicate
-
-    Add with a selected target and no target name (//targ add)
-
-    Save a set
-    Save a nil set
-    Save a set with no name
-    Save a duplicate set
-
-    Check settings persistance
-
-    Check help + null command for help
-]]
