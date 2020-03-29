@@ -3,14 +3,14 @@ _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = {'targeter', 'targ'}
 _addon.version = '0.0.1'
 
-res = require('resources')
 config = require('config')
 packets = require('packets')
 require('tables')
 
 settings = config.load({
     targets = L{},
-    add_to_chat_mode = 8
+    add_to_chat_mode = 8,
+    presets = {},
 })
 
 commands = {}
@@ -21,7 +21,7 @@ commands.save = function(preset_name)
         return
     end
 
-    settings.presets[preset_name] = settings.targets
+    settings.presets[preset_name] = L{settings.targets:unpack()}
     settings:save()
     windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' saved')
 end
@@ -32,7 +32,7 @@ commands.load = function(preset_name)
         return
     end
 
-    settings.targets = settings.presets[preset_name]
+    settings.targets = L{settings.presets[preset_name]:unpack()}
     settings:save()
     windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' preset loaded')
 end
