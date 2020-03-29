@@ -5,53 +5,119 @@ _addon.version = '0.0.1'
 
 res = require('resources')
 config = require('config')
+packets = require('packets')
+require('tables')
 
 settings = config.load({
-    targets = {
-
-    },
+    targets = L{},
     add_to_chat_mode = 8
 })
 
-presets = {
-    statues = {
-        ['Corporal Tombstone'], --San d'Oria
-        ['Lithicthrower Image'], --Bastok
-        ['Incarnation Idol'], --Windurst
-        ['Impish Statue'], --Jeuno
-    }
-}
-
 commands = {}
 
-commands.preset = function(preset)
-    if not preset or not presets[preset] then
-        windower.add_to_chat(settings.add_to_chat_mode, 'Unknown ')
+commands.save = function(preset_name)
+    if not preset_name then
+        windower.add_to_chat(settings.add_to_chat_mode, 'Saved targets need a name. //targ save <name>')
         return
     end
 
-    settings.targets = presets[preset]
+    settings.presets[preset_name] = settings.targets
+    settings:save()
+    windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' saved')
 end
 
-commands.add = function() end
-commands.preset = function() end
-commands.remove = function() end
-commands.removeall = function() end
-commands.list = function() end
-commands.target = function() end
+commands.load = function(preset_name)
+    if not preset_name or not settings.presets[preset_name] then
+        windower.add_to_chat(settings.add_to_chat_mode, 'Unknown preset. //targ load <name>')
+        return
+    end
+
+    settings.targets = settings.presets[preset_name]
+    settings:save()
+    windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' preset loaded')
+end
+
+commands.add = function(...)
+    local target = T{...}:sconcat()
+    if not target then return end
+    target = target:lower()
+    if not settings.targets:contains(target) then
+        settings.targets:append(target)
+        settings.targets:sort()
+        settings:save()
+    end
+
+    windower.add_to_chat(settings.add_to_chat_mode, target .. ' added')
+end
+commands.a = commands.add
+
+commands.remove = function(...)
+    local target = T{...}:sconcat()
+    settings.targets:delete(target)
+    settings:save()
+    windower.add_to_chat(settings.add_to_chat_mode, target .. ' removed')
+end
+commands.r = commands.remove
+
+commands.removeall = function()
+    settings.targets = L{}
+    settings:save()
+    windower.add_to_chat(settings.add_to_chat_mode, 'All targets removed')
+end
+commands.ra = commands.removeall
+
+commands.list = function()
+    if #settings.targets == 0 then
+        windower.add_to_chat(settings.add_to_chat_mode, 'There are no targets set')
+        return
+    end
+
+    windower.add_to_chat(settings.add_to_chat_mode, 'Targets:')
+    for _, target in ipairs(settings.targets) do
+        windower.add_to_chat(settings.add_to_chat_mode, '  ' .. target)
+    end
+end
+commands.l = commands.list
+
+commands.target = function()
+    local mobs = windower.ffxi.get_mob_array()
+    local closest
+    for _, mob in pairs(mobs) do
+        if mob.valid_target and mob.hpp > 0 and settings.targets:contains(mob.name:lower()) then
+            if not closest or mob.distance < closest.distance then
+                closest = mob
+            end
+        end
+    end
+
+    if not closest then
+        windower.add_to_chat(settings.add_to_chat_mode, 'Cannot find valid target')
+        return
+    end
+
+    local player = windower.ffxi.get_player()
+
+    packets.inject(packets.new('incoming', 0x058, {
+        ['Player'] = player.id,
+        ['Target'] = closest.id,
+        ['Player Index'] = player.index,
+    }))
+end
+commands.t = commands.target
+
 commands.help = function()
     windower.add_to_chat(settings.add_to_chat_mode, 'Targeter:')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter add <target name> - add a target to the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter preset <preset name> - add a preset of targets to the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter remove <target name> - remove a target from the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter removeall - remove all targets from the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter list - list all targets')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter target - target the nearest target from the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targeter help - display this help')
-    windower.add_to_chat(settings.add_to_chat_mode, 'For more detailed information, see the readme')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ add <target name> - add a target to the list')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ preset <preset name> - add a preset of targets to the list')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ remove <target name> - remove a target from the list')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ removeall - remove all targets from the list')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ list - list all targets')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ target - target the nearest target from the list')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ help - display this help')
+    windower.add_to_chat(settings.add_to_chat_mode, '(For more detailed information, see the readme)')
 end
 
-windower.register_event('addon command', function(command)
+windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
 
     if commands[command] then
@@ -60,3 +126,21 @@ windower.register_event('addon command', function(command)
         commands.help()
     end
 end)
+
+--[[
+    Tests:
+
+    Add a single-worded name
+    Add a multiple-worded name
+    Add a null name
+    Add a duplicate
+
+    Add a preset
+    Add an invalid preset
+    Add a duplicate preset
+
+    Check settings persistance
+    Check sorting
+
+    Check help + null command for help
+]]
