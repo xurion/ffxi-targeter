@@ -5,36 +5,35 @@ _addon.version = '0.0.1'
 
 config = require('config')
 packets = require('packets')
-require('tables')
 
 settings = config.load({
     targets = L{},
     add_to_chat_mode = 8,
-    presets = {},
+    sets = {},
 })
 
 commands = {}
 
-commands.save = function(preset_name)
-    if not preset_name then
-        windower.add_to_chat(settings.add_to_chat_mode, 'Saved targets need a name. //targ save <name>')
+commands.save = function(set_name)
+    if not set_name then
+        windower.add_to_chat(settings.add_to_chat_mode, 'A saved target set needs a name: //targ save <set>')
         return
     end
 
-    settings.presets[preset_name] = L{settings.targets:unpack()}
+    settings.sets[set_name] = L{settings.targets:unpack()}
     settings:save()
-    windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' saved')
+    windower.add_to_chat(settings.add_to_chat_mode, set_name .. ' saved')
 end
 
-commands.load = function(preset_name)
-    if not preset_name or not settings.presets[preset_name] then
-        windower.add_to_chat(settings.add_to_chat_mode, 'Unknown preset. //targ load <name>')
+commands.load = function(set_name)
+    if not set_name or not settings.sets[set_name] then
+        windower.add_to_chat(settings.add_to_chat_mode, 'Unknown target set: //targ load <set>')
         return
     end
 
-    settings.targets = L{settings.presets[preset_name]:unpack()}
+    settings.targets = L{settings.sets[set_name]:unpack()}
     settings:save()
-    windower.add_to_chat(settings.add_to_chat_mode, preset_name .. ' preset loaded')
+    windower.add_to_chat(settings.add_to_chat_mode, set_name .. ' target set loaded')
 end
 
 commands.add = function(...)
@@ -129,10 +128,11 @@ commands.t = commands.target
 commands.help = function()
     windower.add_to_chat(settings.add_to_chat_mode, 'Targeter:')
     windower.add_to_chat(settings.add_to_chat_mode, '  //targ add <target name> - add a target to the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targ preset <preset name> - add a preset of targets to the list')
     windower.add_to_chat(settings.add_to_chat_mode, '  //targ remove <target name> - remove a target from the list')
     windower.add_to_chat(settings.add_to_chat_mode, '  //targ removeall - remove all targets from the list')
-    windower.add_to_chat(settings.add_to_chat_mode, '  //targ list - list all targets')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ save <set> - save current targets as a target set')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ load <set> - load a previously saved target set')
+    windower.add_to_chat(settings.add_to_chat_mode, '  //targ list - list current targets')
     windower.add_to_chat(settings.add_to_chat_mode, '  //targ target - target the nearest target from the list')
     windower.add_to_chat(settings.add_to_chat_mode, '  //targ help - display this help')
     windower.add_to_chat(settings.add_to_chat_mode, '(For more detailed information, see the readme)')
@@ -158,12 +158,12 @@ end)
 
     Add with a selected target and no target name (//targ add)
 
-    Add a preset
-    Add an invalid preset
-    Add a duplicate preset
+    Save a set
+    Save a nil set
+    Save a set with no name
+    Save a duplicate set
 
     Check settings persistance
-    Check sorting
 
     Check help + null command for help
 ]]

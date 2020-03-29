@@ -34,9 +34,9 @@ Simply running `//targ remove` will remove the currently selected target remove 
 
 `//targ` or `//targ help`
 
-## Presets
+## Target sets
 
-Presets are configurable lists you can save for future use. For example, you can set up a preset for Dynamis Divergence statues with the following:
+You can save sets of targets for future use. For example, you can set up a target set for Dynamis Divergence statues with the following:
 
 ```
 //targ add corporal tombstone
@@ -46,7 +46,7 @@ Presets are configurable lists you can save for future use. For example, you can
 //targ save statues
 ```
 
-In the future, use the following to switch to the saved preset:
+In the future, use the following to switch to the saved set:
 
 `//targ load statues`
 
