@@ -39,7 +39,7 @@ end
 
 commands.add = function(...)
     local target = T{...}:sconcat()
-    if not target then return end
+    if target == '' or target == 'nil' then return end
     target = target:lower()
     if not settings.targets:contains(target) then
         settings.targets:append(target)
@@ -53,7 +53,13 @@ commands.a = commands.add
 
 commands.remove = function(...)
     local target = T{...}:sconcat()
-    settings.targets:delete(target)
+    local new_targets = L{}
+    for k, v in ipairs(settings.targets) do
+        if v ~= target then
+            new_targets:append(v)
+        end
+    end
+    settings.targets = new_targets
     settings:save()
     windower.add_to_chat(settings.add_to_chat_mode, target .. ' removed')
 end
