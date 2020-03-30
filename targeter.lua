@@ -12,6 +12,36 @@ settings = config.load({
     sets = {},
 })
 
+function target_nearest(target_names)
+    local mobs = windower.ffxi.get_mob_array()
+    local closest
+    for _, mob in pairs(mobs) do
+        print(mob.name, target_names:contains(mob.name:lower()))
+        if mob.valid_target and mob.hpp > 0 and target_names:contains(mob.name:lower()) then
+            if not closest or mob.distance < closest.distance then
+                closest = mob
+            end
+        end
+    end
+
+    if not closest then
+        windower.add_to_chat(settings.add_to_chat_mode, 'Cannot find valid target')
+        return
+    end
+
+    local player = windower.ffxi.get_player()
+
+    packets.inject(packets.new('incoming', 0x058, {
+        ['Player'] = player.id,
+        ['Target'] = closest.id,
+        ['Player Index'] = player.index,
+    }))
+
+    if player.status == 1 then
+        windower.send_command('wait 0.5; input /attack <t>')
+    end
+end
+
 commands = {}
 
 commands.save = function(set_name)
@@ -100,34 +130,16 @@ end
 commands.l = commands.list
 
 commands.target = function()
-    local mobs = windower.ffxi.get_mob_array()
-    local closest
-    for _, mob in pairs(mobs) do
-        if mob.valid_target and mob.hpp > 0 and settings.targets:contains(mob.name:lower()) then
-            if not closest or mob.distance < closest.distance then
-                closest = mob
-            end
-        end
-    end
-
-    if not closest then
-        windower.add_to_chat(settings.add_to_chat_mode, 'Cannot find valid target')
-        return
-    end
-
-    local player = windower.ffxi.get_player()
-
-    packets.inject(packets.new('incoming', 0x058, {
-        ['Player'] = player.id,
-        ['Target'] = closest.id,
-        ['Player Index'] = player.index,
-    }))
-
-    if player.status == 1 then
-        windower.send_command('wait 0.5; input /attack <t>')
-    end
+    target_nearest(settings.targets)
 end
 commands.t = commands.target
+
+commands.once = function(...)
+    local target = T{...}:sconcat()
+    if target == '' then return end
+    target_nearest(T{target})
+end
+commands.o = commands.once
 
 commands.help = function()
     windower.add_to_chat(settings.add_to_chat_mode, 'Targeter:')

@@ -12,7 +12,7 @@ An FFXI Windower 4 addon that targets the nearest enemy to you based on a target
 
 ## Setting a target
 
-`//targ add aurix` or `//targ a aurix` adds aurix to the target list.
+`//targ add mandragora` or `//targ a mandragora` adds mandragora to the target list.
 
 Simply running `//targ add` will add the currently selected target to the target list.
 
@@ -22,9 +22,15 @@ Simply running `//targ add` will add the currently selected target to the target
 
 ## Removing a target
 
-`//targ remove aurix` or `//targ r aurix` removes aurix from the target list.
+`//targ remove mandragora` or `//targ r mandragora` removes mandragora from the target list.
 
 Simply running `//targ remove` will remove the currently selected target remove the target list.
+
+## Target an enemy once
+
+Sometimes you want to just target an enemy once without adding them to the target list:
+
+`//targ once aurix` or `//targ o aurix` targets aurix and leaves your target list unchanged.
 
 ## Display the target list
 
