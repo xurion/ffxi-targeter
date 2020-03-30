@@ -4,7 +4,7 @@
 
 An FFXI Windower 4 addon that targets the nearest enemy to you based on a target list.
 
-*Use case:* In Dynamis Divergence, quickly target the closest statue amongst other enemies, even if it is right behind you.
+*Example:* In Dynamis Divergence, quickly target the closest statue amongst other enemies, even if it is right behind you.
 
 ## Load
 
@@ -31,6 +31,10 @@ Simply running `//targ remove` will remove the currently selected target remove 
 Sometimes you want to just target an enemy once without adding them to the target list:
 
 `//targ once aurix` or `//targ o aurix` targets aurix and leaves your target list unchanged.
+
+## Removing all targets
+
+`//targ removeall` or `//targ ra` removes all targets from the target list.
 
 ## Display the target list
 
