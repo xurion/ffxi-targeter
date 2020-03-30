@@ -16,7 +16,6 @@ function target_nearest(target_names)
     local mobs = windower.ffxi.get_mob_array()
     local closest
     for _, mob in pairs(mobs) do
-        print(mob.name, target_names:contains(mob.name:lower()))
         if mob.valid_target and mob.hpp > 0 and target_names:contains(mob.name:lower()) then
             if not closest or mob.distance < closest.distance then
                 closest = mob
