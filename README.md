@@ -1,6 +1,6 @@
 # FFXI Targeter
 
-*Note: This is a work in progress.*
+*Note: This is a work in progress. For some reason, there is a targeting delay in lag-prone areas such as Dynamis Divergence - I'll be looking into this to see if it can be fixed or improved, as server-side lag should have no real impact on this addon.*
 
 An FFXI Windower 4 addon that targets the nearest enemy to you based on a target list.
 
